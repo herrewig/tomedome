@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="styles/index.css" rel="stylesheet">
+    <title>TomeDome - Dota</title>
+    <style>
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <div class="header-parent">
+            <div class="header-container">
+                <h1>TomeDome - Dota</h1>
+            </div>
+            <img id="clarity-bottle"
+                src="https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/items/clarity.png">
+            <h3 id="instructions">Impale your Dota knowledge gaps!</h3>
+        </div>
+    </div>
+    <div class="quiz-container">
+
+        <div class="quiz-header">
+            <h2 id="hero-title"></h2>
+            <img id="hero-img">
+        </div>
+
+        <div class="buttons">
+            <button id="next-question">Start</button>
+            <button onclick="location.reload();">Next hero</button>
+        </div>
+
+        <div id="quiz-questions-container">
+        </div>
+
+        <script type="module" src="js/app.js">
+        </script>
+</body>
+
+</html>
