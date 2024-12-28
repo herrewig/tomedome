@@ -86,8 +86,8 @@ func TestServerControls(t *testing.T) {
 			},
 			// Prod URL - this is the one exception to returning http://localhost:8080
 			{
-				url:  "https://api.tomedome.io",
-				want: "https://api.tomedome.io",
+				url:  "https://dota.tomedome.io",
+				want: "https://dota.tomedome.io",
 			},
 			// Prod URL different port
 			{
