@@ -11,11 +11,11 @@ resource "google_cloud_run_v2_service" "api" {
         container_port = 8080
       }
       image = "us-east4-docker.pkg.dev/tomedome/tomedome/api:latest"
-      # liveness_probe {
-      #   http_get {
-      #     path = "/healthz"
-      #   }
-      # }
+      liveness_probe {
+        http_get {
+          path = "/api/v1/healthz"
+        }
+      }
       resources {
         limits = {
           cpu    = "1"
@@ -23,10 +23,13 @@ resource "google_cloud_run_v2_service" "api" {
         }
       }
     }
+    scaling {
+      max_instance_count = 2
+    }
   }
 }
 
-resource "google_cloud_run_v2_service_iam_member" "member" {
+resource "google_cloud_run_v2_service_iam_member" "api" {
   location = "us-east4"
   name     = google_cloud_run_v2_service.api.name
   role     = "roles/run.invoker"
