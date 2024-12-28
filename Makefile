@@ -42,7 +42,7 @@ build-image: build-db
 bounce-api:
 	gcloud run deploy tomedome-api --image us-east4-docker.pkg.dev/tomedome/tomedome/api:latest --region us-east4
 
-publish-image: build-image
+publish-image:
 	gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://us-east4-docker.pkg.dev
 	docker push us-east4-docker.pkg.dev/tomedome/tomedome/api:latest
 	docker logout https://us-east4-docker.pkg.dev
@@ -50,3 +50,5 @@ publish-image: build-image
 publish-static:
 	gsutil -h Cache-Control:"Cache-Control:private, max-age=5, no-transform" cp -r static/* gs://tomedome-static-site/
 	gsutil -h Cache-Control:"Cache-Control:private, max-age=5, no-transform" rsync -x 'node_modules.*' -x '.*\.test\..*' js/src/ gs://tomedome-static-site/js/
+
+publish-all: publish-image publish-static bounce-api
