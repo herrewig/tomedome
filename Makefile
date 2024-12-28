@@ -39,6 +39,9 @@ build-image: build-db
 #################
 # Publish stuff #
 #################
+bounce-api:
+	gcloud run deploy tomedome-api --image us-east4-docker.pkg.dev/tomedome/tomedome/api:latest --region us-east4
+
 publish-image: build-image
 	gcloud auth print-access-token | docker login -u oauth2accesstoken --password-stdin https://us-east4-docker.pkg.dev
 	docker push us-east4-docker.pkg.dev/tomedome/tomedome/api:latest

@@ -4,6 +4,10 @@ resource "google_cloud_run_v2_service" "api" {
   deletion_protection = false
   ingress             = "INGRESS_TRAFFIC_ALL"
 
+  # We set these so we can do deployments with gcloud and not have it taint the resource
+  client = "gcloud"
+  client_version = "504.0.1"
+
   template {
     max_instance_request_concurrency = "120"
     containers {
