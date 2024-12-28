@@ -23,10 +23,13 @@ resource "google_cloud_run_v2_service" "api" {
         }
       }
     }
+    scaling {
+      max_instance_count = 2
+    }
   }
 }
 
-resource "google_cloud_run_v2_service_iam_member" "member" {
+resource "google_cloud_run_v2_service_iam_member" "api" {
   location = "us-east4"
   name     = google_cloud_run_v2_service.api.name
   role     = "roles/run.invoker"
