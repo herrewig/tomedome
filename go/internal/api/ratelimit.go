@@ -19,7 +19,8 @@ import (
 func newClientIpMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		header := r.Header.Get("X-Forwarded-For")
-		if header == "" {
+		// Calls to /healthz usually come from the load balancer.
+		if header == "" && r.URL.Path != "/healthz" {
 			log.Warn("X-Forwarded-For header not found")
 		} else {
 			ips := strings.Split(header, ",")
@@ -35,7 +36,7 @@ func newClientIpMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
 }
 
 func newLimiterMiddleware(next http.Handler) http.Handler {
-	// Limit to 10 requests per minute
+	// Limit to 10 requests per IP per minute
 	rate := limiter.Rate{
 		Period: 1 * time.Minute,
 		Limit:  10,
@@ -44,4 +45,21 @@ func newLimiterMiddleware(next http.Handler) http.Handler {
 	instance := limiter.New(store, rate)
 	middleware := mhttp.NewMiddleware(instance)
 	return middleware.Handler(next)
+}
+
+// Log all requests
+func newLogMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log.WithFields(logrus.Fields{
+			"Method":          r.Method,
+			"X-Forwarded-For": r.Header.Get("X-Forwarded-For"),
+			"RemoteAddr":      r.RemoteAddr,
+			"UserAgent":       r.UserAgent(),
+			"Referer":         r.Referer(),
+			"RequestURI":      r.URL.RequestURI(),
+			"Proto":           r.Proto,
+			"ContentType":     r.Header.Get("Content-Type"),
+		}).Info("request")
+		next.ServeHTTP(w, r)
+	})
 }

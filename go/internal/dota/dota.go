@@ -55,8 +55,6 @@ func NewDotaService(log *logrus.Entry, client DotaClient) *DotaServiceApi {
 
 // Returns the quiz JSON for a random hero
 func (s *DotaServiceApi) GetQuizJson() ([]byte, error) {
-	s.log.Info("fetching quiz json")
-
 	hero, err := s.GetRandomHero()
 	if err != nil {
 		s.log.Errorf("Failed to get random hero: %v", err)
@@ -144,7 +142,7 @@ func (h *Hero) GetQuizJson() []byte {
 func (s *DotaServiceApi) GetRandomHero() (*Hero, error) {
 	heroes, err := s.Client.GetAllHeroes()
 	if err != nil {
-		s.log.Errorf("Failed to list heroes: %v", err)
+		s.log.Errorf("failed to list heroes: %v", err)
 		return nil, err
 	}
 	num := len(heroes)

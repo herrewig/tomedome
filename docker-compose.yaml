@@ -23,19 +23,19 @@ services:
       }' > /etc/nginx/conf.d/default.conf && nginx -g 'daemon off;'"
   api:
     build:
-      context: go 
+      context: go
       dockerfile: Dockerfile
       target: build
     image: api
     volumes:
-    # Sometimes we want to do local dev with a `docker-compose up`. For that, we
-    # need the develop.watch block defined below. But sometimes we need to run
-    # unit tests with `docker-composer run`. For that, we need volume mounts,
-    # not file watch/sync. You can't have both watch and volume mounts for the
-    # same files at the same time. So DISABLE_VOLUME is a hack that let's us
-    # disable volume mounts if we want to do `docker-compose up` (and let the
-    # watch/sync takeover)
-    - "${DISABLE_VOLUME:-./go:/app}"
+      # Sometimes we want to do local dev with a `docker-compose up`. For that, we
+      # need the develop.watch block defined below. But sometimes we need to run
+      # unit tests with `docker-composer run`. For that, we need volume mounts,
+      # not file watch/sync. You can't have both watch and volume mounts for the
+      # same files at the same time. So DISABLE_VOLUME is a hack that let's us
+      # disable volume mounts if we want to do `docker-compose up` (and let the
+      # watch/sync takeover)
+      - "${DISABLE_VOLUME:-./go:/app}"
     environment:
       - TOMEDOME_DB_FILEPATH=/app/internal/assets/mock_data.json
       - TOMEDOME_STRATZ_API_KEY=${TOMEDOME_STRATZ_API_KEY:-nokey}

@@ -37,7 +37,7 @@ func (h *HealthzHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	hero, err := h.dotes.GetQuizJson()
 	if err != nil {
 		h.log.WithField("error", err).Error("failed to fetch quiz json")
-		http.Error(w, "Internal server error", http.StatusInternalServerError)
+		http.Error(w, "internal server error", http.StatusInternalServerError)
 		return
 	}
 
