@@ -168,6 +168,7 @@ func newOuterMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
 			"proto":           r.Proto,
 			"contentType":     r.Header.Get("Content-Type"),
 		})
+		log.Info("request received")
 		ctx := context.WithValue(r.Context(), "log", newLogger)
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})
