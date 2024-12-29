@@ -21,7 +21,7 @@ func newClientIpMiddleware(next http.Handler) http.Handler {
 		header := r.Header.Get("X-Forwarded-For")
 
 		// Calls to /healthz usually come from the load balancer.
-		if header == "" && r.URL.Path != "/healthz" {
+		if header == "" && r.URL.Path != "/api/v1/healthz" {
 			log.Warn("X-Forwarded-For header not found")
 		} else {
 			ips := strings.Split(header, ",")
