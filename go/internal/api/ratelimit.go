@@ -20,9 +20,13 @@ func newClientIpMiddleware(next http.Handler) http.Handler {
 		log := getLogger(r.Context())
 		header := r.Header.Get("X-Forwarded-For")
 
-		// Calls to /healthz usually come from the load balancer.
-		if header == "" && r.URL.Path != "/api/v1/healthz" {
-			log.Warn("X-Forwarded-For header not found")
+		if header == "" {
+			// Just ignore calls to /healthz because they usually
+			// come from the GCP L7 LB. They'll still get rate
+			// limited via request.RemoteAddr
+			if r.URL.Path != "/api/v1/healthz" {
+				log.Warn("X-Forwarded-For header not found")
+			}
 		} else {
 			ips := strings.Split(header, ",")
 			if len(ips) < 2 {
