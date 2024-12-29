@@ -7,12 +7,12 @@ Pave a path to Immortal by eliminating game knowledge gaps!
 # Setup
 * Install `docker` and `docker-compose` for building and running
 * Install `npm` for running js unit tests
-* `make build-js-toolchain` to build container image and install js test toolchain
+* `make setup` to build container image and install js test toolchain
 
 
 # Run tests
 * `make test` for api and js unit tests
-* `make integration-test` runs api integration test against public Stratz API (requires tomedome_STRATZ_API_KEY env var set)
+* `make integration-test` runs api integration test against public Stratz API (requires TOMEDOME_STRATZ_API_KEY env var set)
 
 
 # Run app

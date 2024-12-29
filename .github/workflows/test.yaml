@@ -1,0 +1,38 @@
+# .github/workflows/test.yml
+name: Test Workflow
+
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    types: [opened]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker
+        run: |
+          sudo apt-get remove containerd.io
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          export DOCKER_CONFIG=${HOME}/.docker
+          mkdir -p $DOCKER_CONFIG/cli-plugins
+          curl -SL https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
+          chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
+
+      - name: Set up Node.js (if applicable for your project)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '23'
+
+      - name: Set up
+        run: make setup
+
+      - name: Run tests
+        run: make test
