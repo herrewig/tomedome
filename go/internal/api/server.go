@@ -44,7 +44,8 @@ func newHandler(log *logrus.Entry, enableRateLimiting bool, routes []string, mux
 	handler := newLimiterMiddleware(mux)
 	handler = newClientIpMiddleware(log, handler)
 	handler = newParamValidationMiddleware(log, handler)
-	return newRouteValidationMiddleware(log, routes, handler)
+	handler = newRouteValidationMiddleware(log, routes, handler)
+	return newLogMiddleware(log, handler)
 }
 
 // Do this for all calls to the API
@@ -53,7 +54,7 @@ func newHandler(log *logrus.Entry, enableRateLimiting bool, routes []string, mux
 func newParamValidationMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if len(r.URL.Query()) > 0 {
-			log.Warn("call with params. dropping")
+			log.WithField("path", r.URL.Path).Warn("call with params. dropping")
 			// Don't be too specific in the error message so bad people
 			// can't figure stuff out
 			http.Error(w, "bad request", http.StatusBadRequest)
@@ -75,7 +76,7 @@ func newRouteValidationMiddleware(log *logrus.Entry, routes []string, next http.
 			}
 		}
 		if !found {
-			log.WithField("route", r.URL.Path).Warn("invalid route")
+			log.WithField("path", r.URL.Path).Warn("invalid route, returning 404")
 			http.Error(w, "not found", http.StatusNotFound)
 		}
 	})

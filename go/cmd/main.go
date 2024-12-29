@@ -57,6 +57,8 @@ type Args struct {
 	RunServer bool `arg:"--run-server" help:"Run the API server"`
 	// Dump the hero data as JSON to stdout
 	Dump bool `arg:"--dump" help:"Dump the hero data as JSON"`
+	// Enable rate limiting
+	RateLimiting bool `arg:"--rate-limiting,env:TOMEDOME_RATELIMITING" default:"true" help:"Enable rate limiting"`
 	// Run app in local dev mode (human readable logs vs json)
 	LocalDev bool `arg:"--local-dev,env:LOCALDEV" help:"Run the server in local dev mode"`
 }
@@ -101,5 +103,5 @@ func main() {
 	}()
 
 	// Let's gooooo
-	api.RunServer(ctx, log, true, ":8080", dotes)
+	api.RunServer(ctx, log, args.RateLimiting, ":8080", dotes)
 }
