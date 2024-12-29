@@ -7,7 +7,7 @@ Pave a path to Immortal by eliminating game knowledge gaps!
 # Setup
 * Install `docker` and `docker-compose` for building and running
 * Install `npm` for running js unit tests
-* `make build` to build container image and install js test toolchain
+* `make build-js-toolchain` to build container image and install js test toolchain
 
 
 # Run tests
