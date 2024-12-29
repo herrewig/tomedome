@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/herrewig/tomedome/go/internal/dota"
 	"github.com/sirupsen/logrus"
 )
@@ -42,19 +43,20 @@ func newHandler(log *logrus.Entry, enableRateLimiting bool, routes []string, mux
 		return mux
 	}
 	handler := newLimiterMiddleware(mux)
-	handler = newClientIpMiddleware(log, handler)
-	handler = newParamValidationMiddleware(log, handler)
-	handler = newRouteValidationMiddleware(log, routes, handler)
-	return newLogMiddleware(log, handler)
+	handler = newClientIpMiddleware(handler)
+	handler = newParamValidationMiddleware(handler)
+	handler = newRouteValidationMiddleware(routes, handler)
+	return newOuterMiddleware(log, handler)
 }
 
 // Do this for all calls to the API
 // For now, all it does is reject any calls with params
 // by returning a 400 Bad Request
-func newParamValidationMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
+func newParamValidationMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := getLogger(r.Context())
 		if len(r.URL.Query()) > 0 {
-			log.WithField("path", r.URL.Path).Warn("call with params. dropping")
+			log.Warn("call has params. dropping")
 			// Don't be too specific in the error message so bad people
 			// can't figure stuff out
 			http.Error(w, "bad request", http.StatusBadRequest)
@@ -66,8 +68,10 @@ func newParamValidationMiddleware(log *logrus.Entry, next http.Handler) http.Han
 
 // Before all the param validation and rate-limiting stuff, return a 404 if it's
 // not a valid route.
-func newRouteValidationMiddleware(log *logrus.Entry, routes []string, next http.Handler) http.Handler {
+func newRouteValidationMiddleware(routes []string, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := getLogger(r.Context())
+
 		var found bool = false
 		for _, route := range routes {
 			if r.URL.Path == route {
@@ -76,7 +80,7 @@ func newRouteValidationMiddleware(log *logrus.Entry, routes []string, next http.
 			}
 		}
 		if !found {
-			log.WithField("path", r.URL.Path).Warn("invalid route, returning 404")
+			log.Warn("invalid route, returning 404")
 			http.Error(w, "not found", http.StatusNotFound)
 		}
 	})
@@ -137,4 +141,34 @@ func mapKeys(m map[string]http.Handler) []string {
 		keys = append(keys, k)
 	}
 	return keys
+}
+
+// Retrieve logger from context
+func getLogger(ctx context.Context) *logrus.Entry {
+	logger, ok := ctx.Value("log").(*logrus.Entry)
+	if !ok {
+		// There's absolutely no reason this should ever happen. Fail hard
+		// if it does
+		panic("failed to get logger from context")
+	}
+	return logger
+}
+
+// Add logger to context and pass it all the way through the middleware chain
+func newOuterMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		newLogger := log.WithFields(logrus.Fields{
+			"reqId":           uuid.New().String(),
+			"method":          r.Method,
+			"x-forwarded-for": r.Header.Get("X-Forwarded-For"),
+			"remoteAddr":      r.RemoteAddr,
+			"userAgent":       r.UserAgent(),
+			"referer":         r.Referer(),
+			"requestUri":      r.URL.RequestURI(),
+			"proto":           r.Proto,
+			"contentType":     r.Header.Get("Content-Type"),
+		})
+		ctx := context.WithValue(r.Context(), "log", newLogger)
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }

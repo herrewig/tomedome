@@ -15,7 +15,7 @@ func TestHealthz(t *testing.T) {
 		service := newMockDotaService(getMockQuiz)
 		handler := newHealthzHandler(log, service)
 
-		req := httptest.NewRequest("GET", "/healthz", nil)
+		req := newMockRequest("/healthz")
 		rr := httptest.NewRecorder()
 		handler.ServeHTTP(rr, req)
 
@@ -33,7 +33,7 @@ func TestHealthz(t *testing.T) {
 
 		handler := newHealthzHandler(log, service)
 
-		req := httptest.NewRequest("GET", "/healthz", nil)
+		req := newMockRequest("/healthz")
 		rr := httptest.NewRecorder()
 
 		handler.ServeHTTP(rr, req)
@@ -48,7 +48,7 @@ func TestHealthz(t *testing.T) {
 		service := &MockDotaService{}
 		handler := newHealthzHandler(log, service)
 
-		req := httptest.NewRequest("GET", "/healthz", nil)
+		req := newMockRequest("/healthz")
 		rr := httptest.NewRecorder()
 
 		handler.ServeHTTP(rr, req)

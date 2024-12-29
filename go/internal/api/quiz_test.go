@@ -13,7 +13,7 @@ func TestQuizHappyPath(t *testing.T) {
 	service := newMockDotaService(getMockQuiz)
 	handler := newQuizHandler(logging.NewLogger("error", false), service)
 
-	req := httptest.NewRequest("GET", "/api/v1/quiz", nil)
+	req := newMockRequest("/api/v1/quiz")
 	rr := httptest.NewRecorder()
 	handler.ServeHTTP(rr, req)
 

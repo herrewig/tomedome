@@ -19,7 +19,7 @@ func TestRateLimiting(t *testing.T) {
 		}))
 
 		for i := 0; i < 20; i++ {
-			req := httptest.NewRequest("GET", "/api/v1/quiz", nil)
+			req := newMockRequest("/api/v1/quiz")
 			rr := httptest.NewRecorder()
 
 			handler.ServeHTTP(rr, req)
@@ -36,7 +36,7 @@ func TestRateLimiting(t *testing.T) {
 		}))
 
 		for i := 0; i < 20; i++ {
-			req := httptest.NewRequest("GET", "/api/v1/quiz", nil)
+			req := newMockRequest("/api/v1/quiz")
 			rr := httptest.NewRecorder()
 
 			handler.ServeHTTP(rr, req)
@@ -56,7 +56,6 @@ func TestRateLimiting(t *testing.T) {
 }
 
 func TestClientIpMiddleware(t *testing.T) {
-	log := logging.NewLogger("info", true)
 	wantIp := "1.2.3.4"
 
 	handler := newLimiterMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -65,10 +64,10 @@ func TestClientIpMiddleware(t *testing.T) {
 		}
 		w.WriteHeader(http.StatusOK)
 	}))
-	handler = newClientIpMiddleware(log, handler)
+	handler = newClientIpMiddleware(handler)
 
 	for i := 0; i < 20; i++ {
-		req := httptest.NewRequest("GET", "/api/v1/quiz", nil)
+		req := newMockRequest("/api/v1/quiz")
 		req.Header.Set("X-Forwarded-For", "172.17.29.38,1.2.3.4,192.168.1.1")
 		rr := httptest.NewRecorder()
 
