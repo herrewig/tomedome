@@ -5,7 +5,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/sirupsen/logrus"
 	"github.com/ulule/limiter/v3"
 	mhttp "github.com/ulule/limiter/v3/drivers/middleware/stdlib"
 	"github.com/ulule/limiter/v3/drivers/store/memory"
@@ -16,9 +15,11 @@ import (
 // second-to-last IP in the X-Forwarded-For header is the real
 // client IP. The limiter package doesn't know how to do this
 // natively so we have to write a custom middleware for it
-func newClientIpMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
+func newClientIpMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		log := getLogger(r.Context())
 		header := r.Header.Get("X-Forwarded-For")
+
 		// Calls to /healthz usually come from the load balancer.
 		if header == "" && r.URL.Path != "/healthz" {
 			log.Warn("X-Forwarded-For header not found")
@@ -45,21 +46,4 @@ func newLimiterMiddleware(next http.Handler) http.Handler {
 	instance := limiter.New(store, rate)
 	middleware := mhttp.NewMiddleware(instance)
 	return middleware.Handler(next)
-}
-
-// Log all requests
-func newLogMiddleware(log *logrus.Entry, next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.WithFields(logrus.Fields{
-			"Method":          r.Method,
-			"X-Forwarded-For": r.Header.Get("X-Forwarded-For"),
-			"RemoteAddr":      r.RemoteAddr,
-			"UserAgent":       r.UserAgent(),
-			"Referer":         r.Referer(),
-			"RequestURI":      r.URL.RequestURI(),
-			"Proto":           r.Proto,
-			"ContentType":     r.Header.Get("Content-Type"),
-		}).Info("request")
-		next.ServeHTTP(w, r)
-	})
 }

@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -48,14 +49,13 @@ func getMockQuiz() map[string]interface{} {
 }
 
 func TestServerControls(t *testing.T) {
-	log := logging.NewLogger("error", false)
 	t.Run("params not allowed", func(t *testing.T) {
 		middleware := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		})
-		handler := newParamValidationMiddleware(log, middleware)
+		handler := newParamValidationMiddleware(middleware)
 
-		req := httptest.NewRequest("GET", "/healthz?foo=bar", nil)
+		req := newMockRequest("/healthz?foo=bar")
 		rr := httptest.NewRecorder()
 		handler.ServeHTTP(rr, req)
 
@@ -121,4 +121,10 @@ func TestServerControls(t *testing.T) {
 			}
 		}
 	})
+}
+
+func newMockRequest(path string) *http.Request {
+	r := httptest.NewRequest("GET", path, nil)
+	ctx := context.WithValue(r.Context(), "log", logging.NewLogger("test", true))
+	return r.WithContext(ctx)
 }

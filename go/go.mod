@@ -4,6 +4,7 @@ go 1.23.4
 
 require (
 	github.com/alexflint/go-arg v1.5.1
+	github.com/google/uuid v1.6.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.3
 	github.com/ulule/limiter/v3 v3.11.2
