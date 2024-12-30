@@ -21,3 +21,12 @@ resource "google_project_iam_binding" "run_admin" {
     "serviceAccount:${google_service_account.ci_admin.email}"
   ]
 }
+
+resource "google_project_iam_binding" "gcs_admin" {
+  project = data.google_project.current.project_id
+  role    = "roles/storage.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.ci_admin.email}"
+  ]
+}
