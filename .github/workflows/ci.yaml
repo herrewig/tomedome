@@ -59,11 +59,6 @@ jobs:
           curl -SL https://github.com/docker/compose/releases/download/v2.32.0/docker-compose-linux-x86_64 -o $DOCKER_CONFIG/cli-plugins/docker-compose
           chmod +x $DOCKER_CONFIG/cli-plugins/docker-compose
 
-      - name: Set up Node.js (if applicable for your project)
-        uses: actions/setup-node@v4
-        with:
-          node-version: '23'
-
       - name: Set up
         run: make setup
 
