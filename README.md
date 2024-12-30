@@ -49,7 +49,6 @@ graph TD
 
 
 # todo
-- [ ] ci/cd pipeline
 - [ ] google analytics
 
 
