@@ -30,3 +30,13 @@ resource "google_project_iam_binding" "gcs_admin" {
     "serviceAccount:${google_service_account.ci_admin.email}"
   ]
 }
+
+# Needed for cloud run
+resource "google_project_iam_binding" "service_agent" {
+  project = data.google_project.current.project_id
+  role    = "roles/serverless.serviceAgent"
+
+  members = [
+    "serviceAccount:${google_service_account.ci_admin.email}"
+  ]
+}
