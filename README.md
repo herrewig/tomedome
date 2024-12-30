@@ -50,10 +50,6 @@ graph TD
  ```
 
 
-# todo
-- [ ] google analytics
-
-
 # Roadmap
 
 Current state is MVP for "shipping the smallest useful thing"
