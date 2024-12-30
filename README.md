@@ -3,6 +3,8 @@ Powers https://dota.tomedome.io
 
 Pave a path to Immortal by eliminating game knowledge gaps!
 
+![CI Status](https://github.com/herrewig/tomedome/actions/workflows/ci.yaml/badge.svg)
+
 
 # Setup
 * Install `docker` and `docker-compose` for building and running
