@@ -1,5 +1,5 @@
 export TOMEDOME_DB_FILEPATH=$(PWD)/internal/assets/mock_data.json
-export RUN=docker-compose run --rm api
+export RUN=docker compose run --rm api
 
 ##################
 # Workflow stuff #
@@ -19,11 +19,11 @@ test-go:
 
 # See docker-compose.yml for volume explanation
 run-server: build-dev
-	@DISABLE_VOLUME="/dev/null:/ignore" docker-compose up --watch
+	@DISABLE_VOLUME="/dev/null:/ignore" docker compose up --watch
 
 clean:
 	rm -rf js/node_modules
-	docker-compose down
+	docker compose down
 	docker image rm api
 
 ###############
@@ -34,11 +34,11 @@ build-js-toolchain:
 
 # Build localdev image and JS toolchain for unit testing
 build-dev: build-js-toolchain
-	docker-compose build
+	docker compose build
 
 # Query stratz API and dump data to local file for embedding into binary. See assets package for more info
 build-db:
-	LOGLEVEL=error docker-compose run --rm api go run cmd/main.go --backend stratz --dump > go/internal/assets/data.json
+	LOGLEVEL=error docker compose run --rm api go run cmd/main.go --backend stratz --dump > go/internal/assets/data.json
 
 # Build production image
 build-image: build-db
