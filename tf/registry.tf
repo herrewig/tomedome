@@ -14,18 +14,3 @@ resource "google_artifact_registry_repository" "tomedome" {
     }
   }
 }
-
-# This service account will be used to publish images to the registry from CI
-resource "google_service_account" "publisher" {
-  account_id   = "artifact-registry-writer"
-  display_name = "Artifact Registry Writer Service Account"
-}
-
-resource "google_project_iam_binding" "publisher" {
-  project = data.google_project.current.project_id
-  role    = "roles/artifactregistry.writer"
-
-  members = [
-    "serviceAccount:${google_service_account.publisher.email}"
-  ]
-}
