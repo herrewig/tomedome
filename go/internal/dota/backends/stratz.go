@@ -58,6 +58,7 @@ type AbilityResponse struct {
 		Language struct {
 			DisplayName string   `json:"displayName"`
 			Description []string `json:"description"`
+			Attributes  []string `json:"attributes"`
 		} `json:"language"`
 		Stat struct {
 			Behavior int       `json:"behavior"`
@@ -178,6 +179,7 @@ func (c *StratzClient) getAllHeroData() (*AllHeroesResponse, error) {
 						language {
 							displayName
 							description
+							attributes
 						}
 					}
 				}
@@ -288,6 +290,7 @@ func responseToHero(r HeroResponse) dota.Hero {
 			ShortName:   resp.Ability.Name,
 			DisplayName: resp.Ability.Language.DisplayName,
 			Description: strings.Join(resp.Ability.Language.Description, "\n"),
+			Attributes:  resp.Ability.Language.Attributes,
 			Button:      slotToButton(resp),
 		})
 	}
