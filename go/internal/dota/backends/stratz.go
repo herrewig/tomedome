@@ -3,7 +3,6 @@
 // When the StratzClient is created, https://api.stratz.com/graphiql is called and fetches all data.
 // Data is then served from memory.
 
-
 package backends
 
 import (
