@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
+	"math/rand/v2"
 	"os"
 	"os/signal"
 	"syscall"
@@ -61,6 +63,33 @@ type Args struct {
 	RateLimiting bool `arg:"--rate-limiting,env:TOMEDOME_RATELIMITING" default:"true" help:"Enable rate limiting"`
 	// Run app in local dev mode (human readable logs vs json)
 	LocalDev bool `arg:"--local-dev,env:LOCALDEV" help:"Run the server in local dev mode"`
+	// Dump mock data JSON to stdout
+	DumpMockData bool `arg:"--dump-mock-data" help:"Dump the mock data JSON to stdout"`
+}
+
+// When we change the data schema, we need to update the mock data so we can develop against it.
+// This function dumps a small subset of the hero data to stdout. Usually it's used to write
+// to mock_data.json in the assets package.
+func dumpMockData(log *logrus.Entry, dotes *dota.DotaServiceApi) {
+	log.Info("dumping mock data")
+	heroes, err := dotes.GetAllHeroes()
+	if err != nil {
+		log.WithField("error", err).Fatal("failed to dump heroes")
+	}
+
+	// Shuffle the slice
+	rand.Shuffle(len(heroes), func(i, j int) {
+		heroes[i], heroes[j] = heroes[j], heroes[i]
+	})
+	// Select the first three elements
+	heroesSubset := heroes[:3]
+
+	// Serialize the subset to JSON and print to stdout
+	subset, err := json.Marshal(heroesSubset)
+	if err != nil {
+		log.WithField("error", err).Fatal("failed to marshal subset of heroes")
+	}
+	fmt.Println(string(subset))
 }
 
 // Let's goooo
@@ -72,7 +101,13 @@ func main() {
 	// Get the DotaServiceApi based on the CLI args
 	dotes := getServiceFromArgs(log, args)
 
-	// Don't run the API server, just dump the database to stdout
+	// Dump a small subset of three heroes to stdout to use as mock data
+	if args.DumpMockData {
+		dumpMockData(log, dotes)
+		return
+	}
+
+	// Dump the whole database to stdout
 	if args.Dump {
 		heroes, err := dotes.SerializeDb()
 		if err != nil {
@@ -86,6 +121,8 @@ func main() {
 	if !args.RunServer {
 		log.Fatal("no action specified. use --run-server or --dump")
 	}
+
+	// Ok, based on args we must be running the api server!
 
 	// Listen for SIGINT or SIGTERM
 	ctx, cancel := context.WithCancel(context.Background())

@@ -38,11 +38,12 @@ type Hero struct {
 }
 
 type Ability struct {
-	Id          int    `json:"id"`
-	ShortName   string `json:"short_name"`
-	DisplayName string `json:"display_name"`
-	Button      string `json:"button"`
-	Description string `json:"description"`
+	Id          int      `json:"id"`
+	ShortName   string   `json:"short_name"`
+	DisplayName string   `json:"display_name"`
+	Button      string   `json:"button"`
+	Description string   `json:"description"`
+	Attributes  []string `json:"attributes"`
 }
 
 func NewDotaService(log *logrus.Entry, client DotaClient) *DotaServiceApi {
@@ -121,13 +122,16 @@ func (h *Hero) GetQuizJson() []byte {
 	quiz["attackType"] = h.AttackType
 	quiz["description"] = h.Description
 
-	questions := []map[string]string{}
+	questions := []map[string]interface{}{}
 
 	for _, ability := range h.Abilities {
-		questions = append(questions, map[string]string{
+		questions = append(questions, map[string]interface{}{
 			"prompt":      abilityToQuestion(ability),
 			"abilityName": ability.DisplayName,
-			"answer":      ability.Description,
+			"answer": map[string]interface{}{
+				"description": ability.Description,
+				"attributes":  ability.Attributes,
+			},
 		})
 	}
 

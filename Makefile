@@ -17,6 +17,12 @@ test-js:
 test-go:
 	$(RUN) gotest -short -v ./...
 
+# Generate mock data. When we change the data schema, we need to update the mock data so
+# we can develop against it. This function dumps a small subset of the hero data to
+# stdout. Usually it's used to write to mock_data.json in the assets package.
+generate-mock-data:
+	$(RUN) go run cmd/main.go --backend stratz --dump-mock-data > go/internal/assets/mock_data.json
+
 # See docker-compose.yml for volume explanation
 run-server: build-dev
 	@DISABLE_VOLUME="/dev/null:/ignore" docker compose up --watch
