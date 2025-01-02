@@ -6,5 +6,7 @@ export function fetchQuiz() {
 }
 
 export function markupAbilityAnswer(question) {
-    return `<strong>${question.abilityName}: </strong>${question.answer.description}`;
+    const desc = `<strong>${question.abilityName}: </strong>${question.answer.description}`;
+    const attrs = question.answer.attributes.join('<br>');
+    return `<p class="desc">${desc}</p><p class="attr">${attrs}</p>`;
 }

@@ -61,9 +61,11 @@ type AbilityResponse struct {
 			Attributes  []string `json:"attributes"`
 		} `json:"language"`
 		Stat struct {
-			Behavior int       `json:"behavior"`
-			ManaCost []float64 `json:"manaCost"`
-			MaxLevel int       `json:"maxLevel"`
+			MaxLevel  int   `json:"maxLevel"`
+			Behavior  int   `json:"behavior"`
+			ManaCost  []int `json:"manaCost"`
+			CastRange []int `json:"castRange"`
+			Damage    []int `json:"damage"`
 		} `json:"stat"`
 	} `json:"ability"`
 }
@@ -175,6 +177,7 @@ func (c *StratzClient) getAllHeroData() (*AllHeroesResponse, error) {
 							castRange
 							manaCost
 							maxLevel
+							damage
 						}
 						language {
 							displayName
@@ -276,6 +279,32 @@ func slotToButton(ability AbilityResponse) string {
 	}
 }
 
+// Converts a list of integer levels to a string with a title
+// For example, takes []int{1, 2, 3} and returns "DAMAGE: 1 / 2 / 3"
+func levelsToString(title string, vals []int) string {
+	strLevels := []string{}
+	for _, val := range vals {
+		strLevels = append(strLevels, fmt.Sprintf("%d", val))
+	}
+	return title + ": " + strings.Join(strLevels, " / ")
+}
+
+// Inserts an attribute at the beginning of the list of attributes
+func insertNewAttr(newAttr string, attrs []string) []string {
+	newAttrs := []string{newAttr}
+	newAttrs = append(newAttrs, attrs...)
+	return newAttrs
+}
+
+// Sometimes attributes are just a single member list holding 0. This isn't useful
+// so we'll skip it.
+func shouldIncludeAttribute(vals []int) bool {
+	if vals == nil || (len(vals) == 1 && vals[0] == 0) {
+		return false
+	}
+	return true
+}
+
 func responseToHero(r HeroResponse) dota.Hero {
 	abilities := []dota.Ability{}
 
@@ -283,6 +312,25 @@ func responseToHero(r HeroResponse) dota.Hero {
 		// Skip abilities with no description
 		if len(resp.Ability.Language.Description) < 1 {
 			continue
+		}
+
+		// Some ability stats aren't unique attributes, but they're worth showing with
+		// Examples are Damage, mana cost levels, cast ranges, etc. Not every
+		// ability has these stats. We'll add them to the list of attributes if they exist.
+		if shouldIncludeAttribute(resp.Ability.Stat.Damage) {
+			dmg := levelsToString("DAMAGE", resp.Ability.Stat.Damage)
+			newAttrs := insertNewAttr(dmg, resp.Ability.Language.Attributes)
+			resp.Ability.Language.Attributes = newAttrs
+		}
+
+		if shouldIncludeAttribute(resp.Ability.Stat.ManaCost) {
+			mana := levelsToString("MANA COST", resp.Ability.Stat.ManaCost)
+			resp.Ability.Language.Attributes = append(resp.Ability.Language.Attributes, mana)
+		}
+
+		if shouldIncludeAttribute(resp.Ability.Stat.CastRange) {
+			castRange := levelsToString("CAST RANGE", resp.Ability.Stat.CastRange)
+			resp.Ability.Language.Attributes = append(resp.Ability.Language.Attributes, castRange)
 		}
 
 		abilities = append(abilities, dota.Ability{

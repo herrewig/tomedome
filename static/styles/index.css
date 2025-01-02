@@ -127,3 +127,13 @@ button {
     font-size: 16px;
     padding: 5px;
 }
+
+.attr,
+.desc {
+    margin-bottom: 20px;
+}
+
+.attr,
+.desc:last-child {
+    margin-bottom: 0px;
+}
