@@ -17,6 +17,29 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+// CLI args
+type Args struct {
+	// Specify which data backend to use
+	Backend string `arg:"--backend,required,help:--backend=[json|stratz|embedded]"`
+	// Stratz.com API key
+	StratzApiKey string `arg:"--stratz-api-key,env:TOMEDOME_STRATZ_API_KEY"`
+	// Path to the json db file
+	JsonFilePath string `arg:"--json-db-filepath,env:TOMEDOME_DB_FILEPATH"`
+	LogLevel     string `arg:"env:LOGLEVEL" default:"info"`
+	// For the embedded backend, the name of the embedded json file
+	EmbeddedFileName string `arg:"--embedded-filepname,env:TOMEDOME_EMBEDDED_FILENAME" default:"mock_data.json"`
+	// Run the API server on :8080
+	RunServer bool `arg:"--run-server" help:"Run the API server"`
+	// Dump the hero data as JSON to stdout
+	Dump bool `arg:"--dump" help:"Dump the hero data as JSON"`
+	// Enable rate limiting
+	RateLimiting bool `arg:"--rate-limiting,env:TOMEDOME_RATELIMITING" default:"true" help:"Enable rate limiting"`
+	// Run app in local dev mode (human readable logs vs json)
+	LocalDev bool `arg:"--local-dev,env:LOCALDEV" help:"Run the server in local dev mode"`
+	// Dump mock data JSON to stdout
+	DumpMockData bool `arg:"--dump-mock-data" help:"Dump the mock data JSON to stdout"`
+}
+
 // Returns a DotaServiceApi based on the CLI args
 // Possible backends include:
 // - json: loads db from a json file
@@ -42,29 +65,6 @@ func getServiceFromArgs(log *logrus.Entry, args Args) *dota.DotaServiceApi {
 		log.Fatalf("unknown backend: %s", args.Backend)
 	}
 	return dota.NewDotaService(log, client)
-}
-
-// CLI args
-type Args struct {
-	// Specify which data backend to use
-	Backend string `arg:"--backend,required,help:--backend=[json|stratz|embedded]"`
-	// Stratz.com API key
-	StratzApiKey string `arg:"--stratz-api-key,env:TOMEDOME_STRATZ_API_KEY"`
-	// Path to the json db file
-	JsonFilePath string `arg:"--json-db-filepath,env:TOMEDOME_DB_FILEPATH"`
-	LogLevel     string `arg:"env:LOGLEVEL" default:"info"`
-	// For the embedded backend, the name of the embedded json file
-	EmbeddedFileName string `arg:"--embedded-filepname,env:TOMEDOME_EMBEDDED_FILENAME" default:"mock_data.json"`
-	// Run the API server on :8080
-	RunServer bool `arg:"--run-server" help:"Run the API server"`
-	// Dump the hero data as JSON to stdout
-	Dump bool `arg:"--dump" help:"Dump the hero data as JSON"`
-	// Enable rate limiting
-	RateLimiting bool `arg:"--rate-limiting,env:TOMEDOME_RATELIMITING" default:"true" help:"Enable rate limiting"`
-	// Run app in local dev mode (human readable logs vs json)
-	LocalDev bool `arg:"--local-dev,env:LOCALDEV" help:"Run the server in local dev mode"`
-	// Dump mock data JSON to stdout
-	DumpMockData bool `arg:"--dump-mock-data" help:"Dump the mock data JSON to stdout"`
 }
 
 // When we change the data schema, we need to update the mock data so we can develop against it.
