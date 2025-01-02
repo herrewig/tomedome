@@ -10,9 +10,9 @@ describe('renderQuestions', () => {
 
         // Setup mock quiz data
         questions = [
-            { prompt: 'What is your Q?', abilityName: 'Stifling Dagger', answer: { 'description': 'blah blah' } },
-            { prompt: 'What is your W?', abilityName: 'Phantom Strike', answer: { 'description': 'blah blah' } },
-            { prompt: 'What is your E?', abilityName: 'Blur', answer: { 'description': 'blahhhhh' } },
+            { prompt: 'What your Q?', abilityName: 'Stifling Dagger', answer: { 'description': 'blah blah', 'attributes': ['sup', 'yo'] } },
+            { prompt: 'What your W?', abilityName: 'Phantom Strike', answer: { 'description': 'blah blah', 'attributes': ['nm', 'bra'] } },
+            { prompt: 'What your E?', abilityName: 'Blur', answer: { 'description': 'blahhhhh', attributes: ['whats', 'good'] } },
         ];
     });
 
@@ -25,7 +25,7 @@ describe('renderQuestions', () => {
 
         // Check that the prompt is present in the first question
         const firstQuestionPrompt = quizQuestions[0].querySelector('.quiz-prompt p');
-        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What is your Q?</strong>');
+        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What your Q?</strong>');
 
         // Check that the answer is not present in the first question
         const firstQuestionAnswer = quizQuestions[0].querySelector('.quiz-answer');
@@ -41,11 +41,11 @@ describe('renderQuestions', () => {
 
         // Check that the prompt is present in the first question
         const firstQuestionPrompt = quizQuestions[1].querySelector('.quiz-prompt p');
-        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What is your W?</strong>');
+        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What your W?</strong>');
 
         // Check that the answer is present in the first question
         const firstQuestionAnswer = quizQuestions[1].querySelector('.quiz-answer p');
-        expect(firstQuestionAnswer.innerHTML).toBe('<strong>Phantom Strike: </strong>blah blah');
+        expect(firstQuestionAnswer.innerHTML).toBe('<p class="desc"><strong>Phantom Strike: </strong>blah blah</p><p class="attr">nm<br>bra</p>');
     });
 
     it('should render all questions with prompt', () => {
@@ -57,7 +57,7 @@ describe('renderQuestions', () => {
 
         // Check that the prompt is present in the first question
         const firstQuestionPrompt = quizQuestions[2].querySelector('.quiz-prompt p');
-        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What is your E?</strong>');
+        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What your E?</strong>');
 
         // Check that the answer is not present in the first question
         const firstQuestionAnswer = quizQuestions[2].querySelector('.quiz-answer');
@@ -73,10 +73,10 @@ describe('renderQuestions', () => {
 
         // Check that the prompt is present in the first question
         const firstQuestionPrompt = quizQuestions[2].querySelector('.quiz-prompt p');
-        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What is your E?</strong>');
+        expect(firstQuestionPrompt.innerHTML).toBe('<strong>What your E?</strong>');
 
         // Check that the answer is not present in the first question
         const firstQuestionAnswer = quizQuestions[2].querySelector('.quiz-answer p');
-        expect(firstQuestionAnswer.innerHTML).toBe('<strong>Blur: </strong>blahhhhh');
+        expect(firstQuestionAnswer.innerHTML).toBe('<p class="desc"><strong>Blur: </strong>blahhhhh</p><p class="attr">whats<br>good</p>');
     });
 });
